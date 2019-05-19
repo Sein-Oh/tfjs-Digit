@@ -24,7 +24,7 @@
     ctx.lineCap = "round";
 
     let model, drawing, posX, posY;
-    canvas.addEventListener("mousedown", function (evt) {
+    function down(evt) {
         try {
             posX = Math.round(evt.touches[0].clientX - canvasPos.left);
             posY = Math.round(evt.touches[0].clientY - canvasPos.top);
@@ -33,8 +33,9 @@
             posY = Math.round(evt.clientY - canvasPos.top);
         }
         drawing = true;
-    })
-    canvas.addEventListener("mousemove", function (evt) {
+    }
+
+    function move(evt) {
         if (drawing == true) {
             ctx.beginPath();
             ctx.moveTo(posX, posY);
@@ -48,13 +49,17 @@
             ctx.lineTo(posX, posY);
             ctx.stroke();
         }
-    })
-    canvas.addEventListener("mouseup", function () {
+    }
+    function up() {
         drawing = false;
-    })
-    canvas.addEventListener("mouseleave", function () {
-        drawing = false;
-    })
+    }
+    canvas.addEventListener("mousedown", down);
+    canvas.addEventListener("mousemove", move);
+    canvas.addEventListener("mouseup", up);
+    canvas.addEventListener("touchstart", down);
+    canvas.addEventListener("touchmove", move);
+    canvas.addEventListener("touchend", up);
+    canvas.addEventListener("mouseleave", up);
 
     function clearCnv() {
         ctx.clearRect(0, 0, 150, 150);
@@ -84,8 +89,8 @@
         const tensor = preprocess(canvas);
         const predictions = await model.predict(tensor).data();
         const proposal = predictions.indexOf(Math.max.apply(null, predictions));
-        console.log(proposal + " : " + (predictions[proposal]*100).toFixed(2) + "%");
-        info.innerHTML = proposal + " : " + (predictions[proposal]*100).toFixed(2) + "%";
+        console.log(proposal + " : " + (predictions[proposal] * 100).toFixed(2) + "%");
+        info.innerHTML = proposal + " : " + (predictions[proposal] * 100).toFixed(2) + "%";
     }
 </script>
 
